@@ -1,0 +1,5 @@
+picozero
+micropython-urequests
+micropython-bme280
+micropython-sgp40
+
