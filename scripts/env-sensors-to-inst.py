@@ -29,8 +29,6 @@ print(f"{len(devices)} I2C devices found")
 for device in devices:
     print(f"Decimal address {device}; Hex address: {hex(device)}.")
 
-pico_led.on()
-
 tph_sensor = bme280.BME280(i2c=i2c, address=0x77)
 voc_sensor = sgp40.SGP40(i2c=i2c, addr=0x59)
 
@@ -60,5 +58,3 @@ while True:
             'voc': str(voc)}
     payload = dict_to_payload(data)
     request_inst_url(payload)
-    
-    pico_led.toggle()
