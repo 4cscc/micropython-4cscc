@@ -6,7 +6,7 @@ import sgp40
 
 from wifi import connect
 from inst import request_inst_url, dict_to_payload
-from util import f_to_c_conversion, hpa_to_atm_conversion
+from util import f_to_c_conversion, hpa_to_atm_conversion, get_version
 
 # frequency at which to report data to Initial State (in seconds)
 reporting_frequency_s = 60
@@ -32,6 +32,8 @@ for device in devices:
 tph_sensor = bme280.BME280(i2c=i2c, address=0x77)
 voc_sensor = sgp40.SGP40(i2c=i2c, addr=0x59)
 
+version = get_version()
+
 while True:
     if not wlan.isconnected():
         wlan, ip_address = connect()
@@ -55,6 +57,8 @@ while True:
     data = {'temp-f': '%.2f' % temp_f,
             'pressure-atm': '%.2f' % atm,
             'relative-humidity': '%.2f' % rh,
-            'voc': str(voc)}
+            'voc': str(voc),
+            # TODO: don't pass version everytime (it's just overkill)
+            'micropython-4cscc-version':version}
     payload = dict_to_payload(data)
     request_inst_url(payload)
