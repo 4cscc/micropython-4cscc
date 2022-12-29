@@ -43,6 +43,7 @@ while True:
     
     # TODO: adjust for humidity and temperature with
     # parameters to measure_raw
+    # TODO: figure out unit conversion for VOC
     voc = voc_sensor.measure_raw()
     
     data = {'temp-f': '%.2f' % temp_f,
