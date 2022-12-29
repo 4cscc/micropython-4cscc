@@ -4,15 +4,14 @@ from machine import I2C, Pin
 import bme280
 import sgp40
 
-from wifi import wifi_service, connect
+from wifi import connect
 from inst import request_inst_url, dict_to_payload
 from util import f_to_c_conversion, hpa_to_atm_conversion
 
 
 pico_led.off()
 
-# TODO: test/use wifi_service
-connect()
+wlan, ip_address = connect()
 
 i2c = I2C(id=0, scl=Pin(21), sda=Pin(20))
 sleep(1)
@@ -34,6 +33,9 @@ tph_sensor = bme280.BME280(i2c=i2c, address=0x77)
 voc_sensor = sgp40.SGP40(i2c=i2c, addr=0x59)
 
 while True:
+    if not wlan.isconnected():
+        wlan, ip_address = connect()
+        
     temp_c, pa, rh = tph_sensor.values
     temp_f = f_to_c_conversion(float(temp_c.replace('C', '')))
     atm = hpa_to_atm_conversion(float(pa.replace('hPa', '')))
