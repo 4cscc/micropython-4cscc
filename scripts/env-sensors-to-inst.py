@@ -1,5 +1,7 @@
-from picozero import pico_led
+import sys
 from time import sleep
+
+from picozero import pico_led
 from machine import I2C, Pin
 import bme280
 
@@ -22,7 +24,7 @@ devices = i2c.scan()
 
 if len(devices) == 0:
     print("No I2C device detected.")
-    exit()
+    sys.exit(-1)
 
 print(f"{len(devices)} I2C devices found")
 for device in devices:

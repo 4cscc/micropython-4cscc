@@ -1,7 +1,7 @@
 import json
 
 def get_version():
-    return '2022.12.0-dev'
+    return '2022.12.1-dev'
 
 def f_to_c_conversion(temp_c):
     return (temp_c * 9/5) + 32
