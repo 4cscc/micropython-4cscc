@@ -1,8 +1,7 @@
 import network
 from picozero import pico_led
-from utime import sleep
+from time import sleep
 from util import load_config
-import _thread
 
 
 def _connect(wlan, wifi_config, retry_delay):
@@ -29,21 +28,3 @@ def connect(retry_delay=5):
     wlan.active(True)
     
     return _connect(wlan, wifi_config, retry_delay)
-
-
-# I don't think this works
-def __wifi_service(retry_delay=5, check_delay=60):
-    wifi_config = load_config('wifi')
-    
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-
-    def task(retry_delay, check_delay):
-        while True:
-            sleep(check_delay)
-            _connect(wlan, wifi_config, retry_delay)
-
-    _thread.start_new_thread(task, (5, 60))
-
-
-

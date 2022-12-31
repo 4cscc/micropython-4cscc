@@ -29,5 +29,3 @@ def load_config(level=None, path='config.json'):
                 "Available levels follow:\n {' '.join(config.keys)}")
     else:
         return config
-
-
