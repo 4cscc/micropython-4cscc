@@ -30,7 +30,11 @@ print(f"{len(devices)} I2C devices found")
 for device in devices:
     print(f"Decimal address {device}; Hex address: {hex(device)}.")
 
-tph_sensor = bme280.BME280(i2c=i2c, address=0x77)
+try:
+    tph_sensor = bme280.BME280(i2c=i2c, address=0x77)
+except OSError:
+    print('BME280 not detected. Confirm connection and address.')
+    sys.exit(-1)
 
 version = get_version()
 
@@ -40,7 +44,12 @@ while True:
     
     sleep(reporting_frequency_s)
 
-    temp_c, pa, rh = tph_sensor.values
+    try:
+        temp_c, pa, rh = tph_sensor.values
+    except OSError:
+        print(f'BME280 not detected. Will try again in {reporting_frequency_s} seconds.')
+        continue
+
     temp_c = float(temp_c.replace('C', ''))
     temp_f = f_to_c_conversion(temp_c)
     atm = hpa_to_atm_conversion(float(pa.replace('hPa', '')))
