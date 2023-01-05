@@ -8,11 +8,9 @@ import bme280
 from wifi import connect
 from inst import request_inst_url, dict_to_payload
 from util import f_to_c_conversion, hpa_to_atm_conversion, get_version
-from weather import get_weather, bucket_tipped, spin, RAIN_PIN, WIND_PIN
-import weather
 
 # frequency at which to report data to Initial State (in seconds)
-reporting_frequency_s = 1#60
+reporting_frequency_s = 60
 
 pico_led.off()
 
@@ -38,15 +36,9 @@ except OSError:
     print('BME280 not detected. Confirm connection and address.')
     sys.exit(-1)
 
-weather.rain_sensor.irq(handler=bucket_tipped)
-weather.wind_speed_sensor.irq(handler=spin)
-
 version = get_version()
 
 while True:
-    weather.rain_count = 0
-    weather.wind_count = 0
-
     if not wlan.isconnected():
         wlan, ip_address = connect()
 
@@ -63,9 +55,6 @@ while True:
     atm = hpa_to_atm_conversion(float(pa.replace('hPa', '')))
     rh = float(rh.replace('%', ''))
 
-    rainfall, wind_speed, wind_dir = get_weather(reporting_frequency_s)
-
-    print(rainfall, wind_speed, wind_dir)
     # Send the most recent reading of each sensor to Initial State
     data = {'temp-f': '%.2f' % temp_f,
             'pressure-atm': '%.2f' % atm,
