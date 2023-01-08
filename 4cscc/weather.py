@@ -2,9 +2,11 @@ from machine import ADC, Pin
 import utime
 import math
 
+from util import config
+
 # Rain globals
 RAIN_PIN = 6
-BUCKET_SIZE = 0.2794
+BUCKET_SIZE = 0.2794 # unit: mm
 rain_count = 0
 rain_previous_value = 1
 rain_sensor = Pin(RAIN_PIN, Pin.IN, Pin.PULL_UP)
@@ -30,7 +32,8 @@ smps.value(1)
 
 # These voltages are for a 3.3v power supply and
 # a 4.7kOhm r1
-volts = {2.9: 0.0,
+volts_to_degrees = {
+         2.9: 0.0,
          1.9: 22.5,
          2.1: 45.0,
          .5: 67.5,
@@ -47,6 +50,54 @@ volts = {2.9: 0.0,
          3.1: 315.0,
          2.7 : 337.5}
 
+degrees_to_direction = {
+        0.0: "N",
+        22.5: "NNE",
+        2.1: "NE",
+        67.5: "ENE",
+        90.0: "E",
+        112.5: "ESE",
+        135.0: "SE",
+        157.5: "SSE",
+        180.0: "S",
+        202.5: "SSW",
+        225.0: "SW",
+        247.5: "WSE",
+        270.0: "W",
+        292.5: "WNW",
+        315.0: "NW",
+        337.5: "NNW"}
+
+
+
+def get_volts_to_direction(weather_config):
+    wind_vane_offset = weather_config['wind-vane-offset']
+    if wind_vane_offset not in degrees_to_direction:
+        raise ValueError(
+            'wind-vane-offset must be one of the following values: %s'
+            % ' '.join(degrees_to_direction.keys()))
+
+    def volts_to_direction(volts):
+        try:
+            degrees_from_zero = volts_to_degrees(volts) 
+        except KeyError:
+            print("Unknown voltage, can't compute degrees.")
+            return 'Error'
+
+        corrected_degrees = degrees_from_zero - n_degrees
+        if corrected_degrees < 0:
+            corrected_degrees += 360
+
+        try:
+            direction = degrees_to_direction(corrected_degrees)
+        except KeyError:
+            print("Unknown degrees, can't compute direction.")
+            return 'Error'
+        
+        return direction 
+    return volts_to_direction
+
+volts_to_direction = get_volts_to_direction(load_config('weather'))
 
 def bucket_tipped(pin):
     global rain_count
@@ -69,7 +120,7 @@ def spin(pin):
     wind_count = wind_count + 1
 
 
-def calculate_speed(time_sec):
+def calculate_speed(time_sec, mph=True):
     global wind_count
     circumference_cm = (2 * math.pi) * radius_cm
     rotations = wind_count / 2.0
@@ -77,21 +128,22 @@ def calculate_speed(time_sec):
     dist_km = (circumference_cm * rotations) / CM_IN_A_KM
 
     km_per_sec = dist_km / time_sec
-    km_per_hour = km_per_sec * SECS_IN_AN_HOUR
+    km_per_hour = km_per_sec * SECS_IN_AN_HOUR * ADJUSTMENT
+    if mph:
+        result = km_per_hour * 0.6213711922
+    else:
+        result = km_per_hour
 
-    return km_per_hour * ADJUSTMENT
+    return result
 
 
 def get_weather(interval):
-    rainfall = rain_count * BUCKET_SIZE
-    wind_speed = calculate_speed(interval)
+    rainfall_mm = rain_count * BUCKET_SIZE
+    rainfall_in = rainfall_mm * 0.0393700787
+    wind_speed = calculate_speed(interval, mph=True)
 
     adc_val = adc.read_u16() / MAX
     wind_dir = round(adc_val * 3.3, 1)
+    wind_dir = volts_to_direction(wind_dir)
 
-    try:
-        wind_dir = volts[wind_dir]
-    except KeyError:
-        wind_dir = 'error'
-
-    return rainfall, wind_speed, wind_dir
+    return rainfall_in, wind_speed, wind_dir

@@ -49,10 +49,9 @@ while True:
     weather.rain_count = 0
     weather.wind_count = 0
     
-    weather_iters = 0
-    for i in range(reporting_frequency_s):
-        rainfall, wind_speed, wind_dir = weather.get_weather(1)
-        sleep(1)
+    sleep(reporting_frequency_s)
+
+    rainfall, wind_speed, wind_dir = weather.get_weather(reporting_frequency_s)
 
     try:
         temp_c, pa, rh = tph_sensor.values
