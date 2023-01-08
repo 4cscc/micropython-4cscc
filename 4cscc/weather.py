@@ -147,3 +147,4 @@ def get_weather(interval):
     wind_dir = volts_to_direction(wind_dir)
 
     return rainfall_in, wind_speed, wind_dir
+
