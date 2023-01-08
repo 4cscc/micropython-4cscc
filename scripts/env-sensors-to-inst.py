@@ -57,7 +57,7 @@ while True:
 
     # Send the most recent reading of each sensor to Initial State
     data = {'temp-f': '%.2f' % temp_f,
-            'pressure-atm': '%.2f' % atm,
+            'pressure-atm': '%.4f' % atm,
             'relative-humidity': '%.2f' % rh,
             # TODO: don't pass version everytime (it's just overkill)
             'micropython-4cscc-version':version}
