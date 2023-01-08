@@ -70,7 +70,7 @@ while True:
             'relative-humidity': '%.2f' % rh,
             'rainfall': '%.4f' % rainfall,
             'wind-speed': '%.2f' % wind_speed,
-            'wind-direction': '%f' % wind_dir,
+            'wind-direction': '%s' % wind_dir,
             # TODO: don't pass version everytime (it's just overkill)
             'micropython-4cscc-version':version}
     payload = dict_to_payload(data)

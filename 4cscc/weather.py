@@ -2,7 +2,7 @@ from machine import ADC, Pin
 import utime
 import math
 
-from util import config
+from util import load_config
 
 # Rain globals
 RAIN_PIN = 6
@@ -79,17 +79,17 @@ def get_volts_to_direction(weather_config):
 
     def volts_to_direction(volts):
         try:
-            degrees_from_zero = volts_to_degrees(volts) 
+            degrees_from_zero = volts_to_degrees[volts] 
         except KeyError:
             print("Unknown voltage, can't compute degrees.")
             return 'Error'
 
-        corrected_degrees = degrees_from_zero - n_degrees
+        corrected_degrees = degrees_from_zero - wind_vane_offset
         if corrected_degrees < 0:
             corrected_degrees += 360
 
         try:
-            direction = degrees_to_direction(corrected_degrees)
+            direction = degrees_to_direction[corrected_degrees]
         except KeyError:
             print("Unknown degrees, can't compute direction.")
             return 'Error'
