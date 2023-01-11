@@ -49,7 +49,7 @@ volts_to_degrees = {
 degrees_to_direction = {
         0.0: "N",
         22.5: "NNE",
-        2.1: "NE",
+        45.0: "NE",
         67.5: "ENE",
         90.0: "E",
         112.5: "ESE",
@@ -71,7 +71,7 @@ def get_volts_to_direction(weather_config):
     if wind_vane_offset not in degrees_to_direction:
         raise ValueError(
             'wind-vane-offset must be one of the following values: %s'
-            % ' '.join(degrees_to_direction.keys()))
+            % ' '.join(map(str,degrees_to_direction.keys())))
 
     def volts_to_direction(volts):
         try:
