@@ -6,7 +6,7 @@ from util import load_config
 
 # Rain globals
 RAIN_PIN = 6
-BUCKET_SIZE = 0.2794 # unit: mm
+BUCKET_SIZE = 0.011 # inches
 rain_count = 0
 rain_previous_value = 1
 rain_sensor = Pin(RAIN_PIN, Pin.IN, Pin.PULL_UP)
@@ -14,10 +14,6 @@ rain_sensor = Pin(RAIN_PIN, Pin.IN, Pin.PULL_UP)
 # Wind speed globals
 WIND_PIN = 22
 wind_count = 0
-radius_cm = 9.0
-CM_IN_A_KM = 10000.0
-SECS_IN_AN_HOUR = 3600
-ADJUSTMENT = 1.18
 wind_speed_sensor = Pin(WIND_PIN, Pin.IN, Pin.PULL_UP)
 
 # Wind direction globals
@@ -79,7 +75,7 @@ def get_volts_to_direction(weather_config):
 
     def volts_to_direction(volts):
         try:
-            degrees_from_zero = volts_to_degrees[volts] 
+            degrees_from_zero = volts_to_degrees[volts]
         except KeyError:
             print("Unknown voltage, can't compute degrees.")
             return 'Error'
@@ -93,8 +89,8 @@ def get_volts_to_direction(weather_config):
         except KeyError:
             print("Unknown degrees, can't compute direction.")
             return 'Error'
-        
-        return direction 
+
+        return direction
     return volts_to_direction
 
 volts_to_direction = get_volts_to_direction(load_config('weather'))
@@ -110,7 +106,7 @@ def bucket_tipped(pin):
     rain_previous_value = value
 
 
-def reset_rainfall ():
+def reset_rainfall():
     global rain_count
     rain_count = 0
 
@@ -122,24 +118,19 @@ def spin(pin):
 
 def calculate_speed(time_sec, mph=True):
     global wind_count
-    circumference_cm = (2 * math.pi) * radius_cm
-    rotations = wind_count / 2.0
+    mph = wind_count * 1.492
 
-    dist_km = (circumference_cm * rotations) / CM_IN_A_KM
-
-    km_per_sec = dist_km / time_sec
-    km_per_hour = km_per_sec * SECS_IN_AN_HOUR * ADJUSTMENT
     if mph:
-        result = km_per_hour * 0.6213711922
+        result = mph
     else:
-        result = km_per_hour
+        kmph = mph * 1.609344
+        result = kmph
 
     return result
 
 
 def get_weather(interval):
-    rainfall_mm = rain_count * BUCKET_SIZE
-    rainfall_in = rainfall_mm * 0.0393700787
+    rainfall_in = rain_count * BUCKET_SIZE
     wind_speed = calculate_speed(interval, mph=True)
 
     adc_val = adc.read_u16() / MAX

@@ -48,7 +48,7 @@ while True:
 
     weather.rain_count = 0
     weather.wind_count = 0
-    
+
     sleep(reporting_frequency_s)
 
     rainfall, wind_speed, wind_dir = weather.get_weather(reporting_frequency_s)
