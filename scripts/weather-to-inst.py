@@ -11,7 +11,7 @@ from util import f_to_c_conversion, hpa_to_atm_conversion, get_version
 import weather
 
 # frequency at which to report data to Initial State (in seconds)
-reporting_frequency_s = 60
+reporting_frequency_s = 5
 
 pico_led.off()
 

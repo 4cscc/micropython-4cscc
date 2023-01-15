@@ -118,7 +118,7 @@ def spin(pin):
 
 def calculate_speed(time_sec, mph=True):
     global wind_count
-    mph = wind_count * 1.492
+    mph = (wind_count * 1.492) / time_sec
 
     if mph:
         result = mph
