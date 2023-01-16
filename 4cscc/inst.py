@@ -31,8 +31,11 @@ def request_inst_url(payload, access_key=None, bucket_key=None):
     
     try:
         request = urequests.get(url)
-    except OSError:
+    except (OSError, ValueError, TypeError) as e:
         print(f'Failed to request url: {url}')
+        print('Caught and ignored the following '
+              'error while requesting URL:\n '
+              f'{e.__class__.__name__}: {str(e)}')
     else:
         if 200 <= int(request.status_code) < 300:
             print(f'Request successful. Sent:\n {payload}')
