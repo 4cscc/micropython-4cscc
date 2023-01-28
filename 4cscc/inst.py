@@ -30,16 +30,19 @@ def request_inst_url(payload, access_key=None, bucket_key=None):
     url = f'{inst_base_url}&{payload}'
     
     try:
-        request = urequests.get(url)
+        response = urequests.get(url)
     except (OSError, ValueError, TypeError) as e:
         print(f'Failed to request url: {url}')
         print('Caught and ignored the following '
               'error while requesting URL:\n '
               f'{e.__class__.__name__}: {str(e)}')
+        if 'response' in locals():
+            print('Debug note: response variable existed.')
+            response.close()
     else:
-        if 200 <= int(request.status_code) < 300:
+        if 200 <= int(response.status_code) < 300:
             print(f'Request successful. Sent:\n {payload}')
         else:
-            print(f'Request status code:\n {request.status_code}')
-            print(f'Request content:\n {request.content}')
-        request.close()
+            print(f'Request status code:\n {response.status_code}')
+            print(f'Request content:\n {response.content}')
+        response.close()
