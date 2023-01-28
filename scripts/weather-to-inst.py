@@ -71,7 +71,6 @@ while True:
             'rainfall': '%.4f' % rainfall,
             'wind-speed': '%.2f' % wind_speed,
             'wind-direction': '%s' % wind_dir,
-            # TODO: don't pass version everytime (it's just overkill)
             'micropython-4cscc-version':version}
     payload = dict_to_payload(data)
     request_inst_url(payload)
